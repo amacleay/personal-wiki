@@ -1,0 +1,19 @@
+= Security model in the universal portal=
+
+==General==
+
+AthenaNet contains a bunch of information which should be protected from unauthorized access.  
+
+===Definitions===
+
+
+==Web App==
+
+==here is code==
+
+{{{class="brush: perl" >
+sub ResourceSecure {
+	my (@args) = @_;
+	return 1;
+}
+}}}

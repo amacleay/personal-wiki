@@ -8,34 +8,129 @@ The relationship between the universal portal web application and athenaNet
 
 ## Scope
 
-The purpose of this document is to clarify the security design of the universal portal.  There are the following communications channels which need to be addressed:
+The purpose of this document is to clarify the security design of the universal portal.
 
-* Browser to universal portal server
-	* HTTP
-* Universal portal to athenaNet
-	* Primarily synchronous
-	* Some asynchronous
-* athenaNet to universal portal
-	* Primarily asynchronous
-	* Some synchronous
+* Overview of the universal portal
+	* What is it?
+	* The components
+	* Outline of communications channels
+	* Users and resources
+	* Overview of communication types
+* Web application security overview
+	* What is the problem?
+	* Definition of _resource_
+	* A proposition
+	* Relationship with existing protocols
 
 ---
 
-## Limit to scope
+## What is the universal portal?
 
-We will assume the following:
-* The universal portal and athenaNet communicate over secure channels
-* The universal portal and athenaNet have a mechanism for establishing trust about identiy
+The universal portal is a new web application in the athenaNet product suite aimed at the general public.
 
-<section data-markdown="example.md" data-separator="^\n\n\n" data-separator-vertical="^\n\n" data-separator-notes="^Note:"></section>
+* Be more patient focused: allow patients to see all their health information in one place
+* Create a marketplace for healthcare, starting with the ability to search and schedule appointments across all of athenaNet
+* Make baseline capabilities from our existing portal cross-context:
+* Leverage what we can that already exists
+* Not planning to roll this out at scale until 2017
 
-# Title
-## Sub-title
+---
 
-Here is some content...
+## Components
 
-Note:
-This will only display in the notes window.
+The universal portal will consist of:
+* A database
+	* Login information
+	* Mappings between a set of login credentials and bundles of patients and permissions in athenaNet
+* Web server pool
+	* https://my_health.athenahealth.com or something
+	* Serves both unauthenticated workflows (shopping) and authenticated (patient portal)
+* Job servers
+
+---
+
+## Not components
+
+The universal portal will get most of its data on the fly from _external services_:
+* athenaNet practices
+* athenaNet Global Scheduling service
+* athenaNet Provider Directory service
+* athenaNet Master Patient Index service
+* Eventually, third party services <!-- .element: class="fragment" data-fragment-index="2" -->
+	* Epic?<!-- .element: class="fragment" data-fragment-index="2" -->
+	* Cerner?<!-- .element: class="fragment" data-fragment-index="2" -->
+	* etc<!-- .element: class="fragment" data-fragment-index="2" -->
+
+---
+
+## What is a user?
+
+First question: *a user of what?*
+
+To the universal portal, a user is a person who uses the universal portal.
+They may be:
+* Shopping for immediate care
+	* *"I have a headache and this facebook link says I can find an appointment"*
+* Shopping for a new PCP
+	* *"I want a woman doctor with great reviews, and this facebook link says I can find her!"*
+* Managing their health or healthcare
+	* This is the traditional "patient portal experience" we serve today
+	* ...but better<!-- .element: class="fragment" data-fragment-index="2" -->
+
+	
+---
+
+## What is a user?
+
+To athenaNet, the *universal portal is the user* requesting a resource.  The universal portal requests a resource *on behalf of a universal portal user*.
+
+---
+
+## What is a resource?
+
+* Owned by universal portal user
+	* Claim data
+	* Chart data
+	* Demographics
+	* Vitals
+* Other
+	* Appointment slots
+	* Department location
+	* Messaging settings
+
+---
+
+## How is a resource defined?
+
+A **resource** as currently conceived in athenaNet is *a class of data* to which permission may be granted to add, update, or remove.
+
+```
+ResourceSecure($Global::session{USERNAME}, 'CHARTMERGE')
+	or confess "You can't merge charts!";
+```
+
+When athenaNet is considering a request from the universal portal, 
+a **resource** is either *a class or an instance of data* to which permission may be granted to add, update, or remove.
+
+```
+# Requesting a specific resource on behalf of a user
+ExternalResourceSecure('UPORTAL', $portal_user, $requested_args)
+	or confess "You can't merge that person's chart!";
+# Requesting a class of behavior
+ExternalResourceSecure('UPORTAL', $portal_user, 'PROVIDERSEARCH')
+	or confess "You can't merge charts, silly universal portal";
+```
+
+---
+
+## Communications channels
+
+* Web application
+	* User's browser to the universal portal server
+	* Universal portal server to _external services_
+		* Right now, this is code for athenaNet web services <!-- .element: class="fragment" data-fragment-index="2" -->
+* Offline communications
+	* athenaNet practices to universal portal
 
 ---
 

@@ -68,7 +68,7 @@ William Kapke (@williamkapke)
 
 Does a great review of the history of openness of the node foundation, re: io.js.  Evidently iojs was an open fork that was merged back in nodejs in the last couple years.
 
-The slides are all beautiful hi res images, almost no text - really really engaging, and beautiful.
+The slides are all beautiful hi res images, almost no text - really really engaging, and beautiful.  Made using images from https://pexels.com which now is going to change my life, presentation made in keynote
 
 Relationship with linux foundation: nodejs pays linux for consultation services. "Like homeowners association management company"
 
@@ -127,5 +127,88 @@ http://github.com/Node-DC - model application datacenter workloads
 Working on network accelerator - big opportunity for big perf improvement in api gateway (io bound)
 
 ### link - collaborate with OS
+
+---
+
+# Tuesday morning
+
+## Reading node core
+
+Rich @Trott, UC San Fran
+
+https://github.com/nodejs/node/tree/master/test
+
+Tests use their own test framework https://github.com/nodejs/node/blob/master/test/common.js - looks to use TAP
+
+http://nodetodo.org/ This guy is one of the two doing nodetodo - a way to get into node core.
+
+## Developing nirvana
+
+Corey Butlery, https://Author.io (static desktop web server)
+
+"Time is the currency of life"
+
+Manage
+* time
+* stress
+
+This feller created NVM for windows around node 0.11 - managing tons of change.  What makes it popular?
+
+* Trust.  Trick: piggyback off trusted tech.
+* keep asking questions
+
+Not the most excellent talk.
+
+## Nodifying the enterprise
+
+Prince Soni, To The New (company)
+
+Architecting node projects at work.
+
+If one more person tells me that JS is the fastest growing language I'm going to do a backflip. Holy crap, he's giving a JS history lesson.
+
+### Evolution (this is kind of bogus):
+
+* lightweight server and API layer
+* real-time socket apps
+* enterprise apps
+* IOT
+* Desktop, electron
+
+### How do enterprises benefit from node?
+
+* Rapid delivery
+  * Fallacy that nodejs <=> microservice architecture
+* change management:
+  * Fallacy that nodejs <=> microservice architecture
+* LTS:
+  * That's idiotic - as though nodejs invented LTS.  They seem to be doing it well, though.
+
+Literally no content.
+
+### Security
+
+Configuration security - helmet package helps with headers.
+
+Session security: csrf, cookies.
+
+Code: don't eval, be careful with stack traces.  No help!
+
+NSP, N|Solid - frameworks with sec and monitoring frameworks.
+
+### Enterprise toolkits
+
+IDEs - atom, sublime, webstorm
+
+Frameworks - sails, hapi, etc
+
+I could have fucking googled the content of this talk in a couple of hours.  Why did this cost $600?
+
+Did they PAY this speaker?
+
+---
+
+# Wednesday afternoon
+
 
 

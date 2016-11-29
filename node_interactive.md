@@ -208,7 +208,121 @@ Did they PAY this speaker?
 
 ---
 
-# Wednesday afternoon
+# Tuesday early afternoon
 
+## Don't let node take the blame
+
+Daniel Khan Lead at dynatrace @dkhan
+
+paypal - started using nodejs to prototype, now use for production
+
+One gets enterprise-y stuff to talk to a new node service - slowness in one of the reliant services can manifest in a node hub.
+
+Proactive defense - know how it works.  Look into CPU v memory.
+
+memory is code segment, stack, heap, used heap - given with `process.memoryUsage()` - can just write out to a csv and analyze!
+
+How to synthesize a memory leak? shared on twitter.  `unused` is not called, `someMethod` is not called.  Closure contains a reference to an unused method - it's a circular reference.  Heap is a graph, and circular references trick GC because it doesn't detect them.
+
+v8-profiler - http://bit.ly/1Pvijiy - can feed directly into chrome dev tools.  blog: http://bit.ly/1fb0Xm (image is a heat graph on cpu usage)
+
+Reference to netflix blog "node.js in flames" - growing routing table problem.  express routing table lookups are `O(n)` because it's stored in an array, not a hashtable.
+
+Mentions trace by risingstack, N|Solid.  Tools that give nodejs metrics.
+
+"Boundaries between tiers in a stack are boundaries between generations, in a way"
+
+backpressure - node service calls out to slower system, requests can back up and _cause node to fail_.
+
+Solution: one-off monitoring?
+Thomas watson will talk about transactional tracing in node.  (dynatrace does it as well), zipkin?.  At then, go for one single alert.
+
+Summary:
+
+* Use dedicated monitoring tools for debugging and tracing, and look to what node provides
+* Consider transactional tracing tools that follows the tiers
+
+## Solving service discovery
+
+Or, why each microservice should believe it's the only one in the world
+
+Richard Rodger nearForm @rjrodger
+
+"Here's the story we went on"
+
+Perfection - the assumption that there will be no bugs creates bureaocracy.
+gossamer albatross - more appropriate than shuttle flight system.  System was tuned for iteration - replaceable parts, etc.
+
+Node modules - subpar for for components of an infrastructure.
+
+composibility - the service interface determines how composable components are => yak shaving.
+
+What is a microservice?
+
+* independent process
+* communicate via messages (rest? http? whatever)
+* component model
+
+```
+A -> B
+
+bad /\
+
+-------
+
+   A ->
+-> B
+
+good /\
+```
+You can't get this second bit writing HTTP rest calls in your app.  Requires identity.
+
+507 Mechanical Movements - book with mechanical components.
+
+* Pattern match:
+  * messages are first-class in code
+  * Basically talking about seneca-type messaging
+* Transport independence
+
+Requires peer-to-peer.  "scalable weakly consistent" SWIM
+
+OK, nearform is seneca.
+@taomicroservice
+
+## full stack testing
+
+Stacy Kirk, QualityWorks @queenofagileqa
+
+"The testing pyramid" - unit, integration, functional, manual
+
+OK, you don't need to sell me on testing...
+
+Assertion: "nodejs makes test automation a lot easier"
+
+### Some tools
+
+* nightwatch - https://github.com/nightwatchjs/nightwatch - ui testing framework
+* casperjs w/ phantom
+* chakram - REST test framework
+* webdriver.io - mobile - recommended with mocha and appium
+* intern.io - sort of a "do literally everything" framwork
+* mocha (ugh...)
+* jasmine - BDD
+* karma - angular
+* qualitywatcher.io - reporting dashboard!
+* phantomas - perf, looks like a well-featured tool
+* qualitymeter - perf, visualize perf data, maybe from phantomas
+
+### best practices
+
+* Integrate tests in `test/` - means you can just write `npm test`
+* Data-driven testing (you know about that)
+* Use page-object pattern
+* Be able to _show_ data from testing results - to show leadership!
+* Test performance up front
+
+`expect().to.have.schema` - Check that out! http://chaijs.com/plugins/chai-json-schema/
+
+http://assess.qualityworkscg.com
 
 

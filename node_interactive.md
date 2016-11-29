@@ -325,4 +325,103 @@ Assertion: "nodejs makes test automation a lot easier"
 
 http://assess.qualityworkscg.com
 
+---
+
+# Tuesday late afternoon
+
+## Documentation
+
+Rand McKinney IBM/strongloop  @randmckinney
+http://loopback.io
+
+* testing info
+* style guide
+* process guidelines
+
+### How to fix?
+
+* Triage doc tasks - put them into the process:
+  * strongloop uses a 'needsdoc' label to note things which require doc changes
+* Have a supportive doc framework
+* require tests and docs for all pulls
+* Have a curator (README czar/editor)
+* Make it easy to contribute
+* Provide authoring components
+* Organized:
+  * usable search
+  * navigation
+* Up-to-date
+
+### Types
+
+* API (ie jsdoc)
+* Task (how-to)
+* Concept (apologia for design)
+* Tutorial (getting started/quickstart)
+
+loopback using strongdoc (like jsdoc, looks proprietary)
+
+Examples are critical
+
+### Frameworks
+
+* README:
+  * auto-published
+  * limited to markdown
+  * should basically look like the top of POD
+* built-in wiki:
+  * Doesn't "clutter" project with docs
+  * https://github.com/netflix/hysterix
+* Jekyll site:
+  * customizable layout, branding, etc
+  * A bit more work
+  * loopback.io and expressjs.org both use jekyll
+
+## ChakraCore
+
+Arunesh Chandra MS @aruneshc
+
+ChakraCore is the core of the JS engine for Microsoft Edge browser
+
+Is OSS, developed entirely in https://github.com/Microsoft/chakracore
+
+Is x-platform: linux and OS X (experimental, interpreter only)
+
+ARM thumb-2 was not targeted by node, but was by windows IoT - so they started on node-chakracore
+
+Started with v8 emulating shim
+
+https://aka.ms/NodeTTD - time-travel debugging
+
+I didn't pay much attention.
+
+## Perf stores
+
+David Clements, nearform @davidmarkclem
+
+http://davidmarkclements.github.io/perf-stories
+
+high-performance code that looked like it was written by a novice - comment optimized code.
+
+* perf-sym - mapping from osx hex addresses to symbols
+* 0x - native flame graph generation from node perf
+* autocannon (alt to wrk or apache bench) - stress testing web applications
+* pino - high-performance logger, compatible with bunyon
+
+The eval trick: take inputs to a function and function def and eval as a string
+
+## Javascript minus javascript
+
+Sarah Meyer, buzzfeed @meyerini
+
+js first - site only works with JS enabled
+
+URL - should change as resource changes
+
+* Create bidirectional mapping between URLs and page state
+* respond to XHR headers with JSON and non-XHR with HTML
+
+Fun talk.  Pretty high-level, not much detail.
+
+
 

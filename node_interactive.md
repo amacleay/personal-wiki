@@ -424,4 +424,217 @@ URL - should change as resource changes
 Fun talk.  Pretty high-level, not much detail.
 
 
+# Wednesday morning
+
+## Event loop
+
+Sam Roberts, IBM/strongloop @octetcloud
+
+Text on the presentation a bit tough to read from my seat.
+
+###
+
+```
+int s = socket();
+```
+/\ file descriptor for a socket
+
+problem: thread per socket
+```
+int server = socket();
+bind(server, 80);
+listen(server);  // <- at this point, now accepting instead of writing
+while (int con = accept(server))
+```
+`accept` blocks, and when resolves, get a new socket connection
+
+While threads are lighter now, thread/socket is still relatively heavy.
+
+soln: epoll (linux, BSD uses kqueue)
+
+```
+int s = ...;
+int eventId = epoll_create1(0);
+struct epoll_event ev = { events = EPOLLIN, ...};
+while (int max = epoll_wait(eventId, events, 10)) // blocking
+{for n=0,n<max, n+++) {
+ //
+ int con = accept(server);
+ // subscribe to this conn in epoll_event
+ }}
+ 
+```
+
+This is hard, thus `libuv`
+
+"A semi-infitite lopp poling on OS until some file descriptors ready"
+
+semi-infinite: `unref` marks handles as unused; node exits when nothing is being listened.  Nice trick for allowing node to free on non-critical resources!
+
+What can be polled?
+
+* pollable file descriptors (not real files, but other handles)
+* time
+* other things: tough
+
+file-system: can't be selected on directly, but use single-byte 2-ended pipe.  *Thread pool*
+
+Sometimes pollable: dns.  DNS not always used.  `dns.lookup()` calls `getaddrinfo()` is not async-able.
+
+C++ addons are only sometimes pollable.
+
+Useful metric: loop time.  Should finish 8-15ms.
+
+http://goo.gl/N7oLVK - code & slides
+
+http://goo.gl/EIPclI - Bert Belder's talk
+
+Really excellent talk!
+
+Spoke to Sam after.  He described backpressure:
+Server is not able to read off TCP socket, client is blocked, or queues - whatever.  Client is taking the brunt, but server is safe - distributed pressure.  But only works when server is using `streams` for that TCP conn. Read https://nodejs.org/dist/latest-v6.x/docs/api/stream.html - are streams used natively by the http/tcp server/client libs?
+
+## Security
+
+Guy Podjarny, Snyk @guypod
+
+The things making node awesome make it vulnerable.
+
+~14% of NPM packages have known vluns (snyk internal data october 2016)
+
+Demo in https://github.com/snyk/goof
+
+st has a directory traversal vuln : `public/../..` doesn't work, but `public/%2e%2e/%2e%2e` does
+
+`[Gotcha](javascript:alert(1))` - he demos that the browser interacts with sanitization to break encoding and allow an XSS attack
+
+DoS vuln - since thing is single-threaded, if you choke a single thread with a bad regexp, you choke all your clients
+
+mongoose buffer vuln - JSON deserialization: passing in an integer instead of string to buffer instantiation leaks proc memory
+
+Shit, Snyk has a _really_ nice tool for this.  Literally created a PR in github that patches the exploits.
+
+https://snyk.io/test
+
+## Crypto
+
+Adam Englander, iovation @adam_englander
+
+Cool slide: AES-ECB encrypted Tux is still recognizable (AES-CBC is good)
+
+Good entropy: IVs and feedback loops (like CBC)
+
+### symmetric shared secrets
+
+block or stream ciphers - CBC
+
+Don't use ECB (electronic cookbook)
+
+Dig signature for authenticity - HMAC (SHA256 better than MD5 for collision resistance)
+
+### public/private key pairs
+
+Private key can encrypt, decrypt, sign, and verify
+
+Public key can only encrypt and verify
+
+2048 is the current minimum recommended
+
+RSA can only encrypt or sign up to key length, which can be problematic.  Can be mixed with symmetric key techniques (I don't understand how)
+
+`PKCS1_PADDING` no good, `PKCS1_OAEP_PADDING` good
+
+### key derivation
+
+Inject salt, iterate to make expensive, moar threads moar memory
+
+* argon21 new hotness [https://npm.im/argon2]
+* scrypt preferable
+* bcrypt acceptable...
+* pbkdf2 not good
+
+### Stuff
+
+ecryption reversible, key derivation/digital signature not
+
+Dig signature for authenticity - HMAC (SHA256 better than MD5 for collision resistance)
+
+key derivation : computationally expensive by design - important
+
+### recommendations
+
+* use `crypto.randomBytes` for randomness
+* Use asym RSA for transfer, and AES-CBC generally
+* AES: aes-256-cvc /sha256
+* RSA: 20148 PKCS1_OAEP / rsa-sha256
+
+## Performance
+
+@wa7son
+
+Old: patch literally everything async to install a handler (done by opbeat, new relic, etc)
+
+New: AsyncHooks https://github.com/nodejs/diagnostics (diag working group) - still experimental, not documented.
+
+```
+var aW = process.binding('async_wrap');
+
+aW.setupHooks({ init, pre port, destroy});
+aW.enable();
+function init ();
+function pre()
+...
+```
+
+Secret function: `process._rawDebug()` is a synchronous `console.log`
+
+IO in user space is a problem.  Embedder API to fix - provides an async hook emitter API.
+
+## Debugging
+
+Josh Gavant at microsoft @joshugav
+
+https://github.com/nodejs/diagnostics
+https://github.com/nodejs/post-mortem
+
+* node-inspect, v8 inspector
+* nodereport - dump state on sigs and crashes
+* llnode - extension to lldb
+* v8 tracingcontroller - still just a PR
+
+### v8 inspector
+
+Same protocol as chromium, step, conn to live script, heap, CPU profiling
+
+Used 
+* tshark - wireshark tool
+* wscat - websocket connection tool.  Kinda opens a WS terminal.
+
+### Inspector
+
+localhost:9229
+* `/json/list`
+* `/version`
+* `/protocol` - full schema for inspector
+
+You get the UUID to use with inspector by the end of the chrome-devtools string.
+ `wscat -c ws://localhost:9229/<uuid>`
+ 
+ Search chrome debugger protocol
+ 
+ Used chrome-remote-interface
+ Used node-inspect, which is a CLI client, as opposed to opening in chrome
+ 
+## Building and shipping with Docker
+
+Sophia Parafina, Docker @spara
+
+Owl drawer!  Good metaphor.  Someone gives you two circles, and you have to draw the owl.
+
+"A virtual machine is a house, a container is an apartment building"
+
+Tiers: image, container, engine
+
+docker-swarm-visualizer - super useful tool if using swarm
+
 

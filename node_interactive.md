@@ -284,7 +284,7 @@ You can't get this second bit writing HTTP rest calls in your app.  Requires ide
   * Basically talking about seneca-type messaging
 * Transport independence
 
-Requires peer-to-peer.  "scalable weakly consistent" SWIM
+Requires peer-to-peer.  "scalable weakly-consistent infection-style membership protocol" SWIM
 
 OK, nearform is seneca.
 @taomicroservice
@@ -637,4 +637,163 @@ Tiers: image, container, engine
 
 docker-swarm-visualizer - super useful tool if using swarm
 
+---
 
+# Wednesday early afternoon
+
+## Real life troubleshooting
+
+Damian Schenkelman, Auth0 @dschenkelman
+
+### Meory leaks
+
+Sawtooth pattern: gc periodically cleaning up
+
+`--max-old-space-size` - node arg to up heap size when there is a problem
+
+Drain connections when memory starts to spike - "nice" restarts
+
+https://github.com/node-inspector/v8-profiler
+
+Strings in the heap snapshot debugger can be useful - often contain context
+
+forever-agent - for persistent connections (caused them problems when logging)
+
+kinesis - stream service (aside)
+
+### CPU bottlenecks
+
+Used flame graphs
+
+https://github.com/auth0/node-baas - same interface as bcrypt, but calls out to a service
+
+## scaling state
+
+Matteo Collina nearForm @matteocollina
+
+Round robin LB - state changing ops w/ round robin imply some kind of single bottleneck.  Local caching doesn't work.
+
+Application-level sharding.  But how to assign?  And what if topology changes?  Every peer needs to know about sibling health.
+
+application-level sharding
+https://www.npmjs.com/package/upring
+
+upring-kv
+upring-pubsub
+
+server sent events
+
+Read the dynamo paper!
+
+All data laid out in consistent hashring.  "scalable weakly-consistent infection-style membership protocol" SWIM. farmesh by google.
+
+message passing just like seneca.
+
+Node streams passed around as messages in upring.
+
+`upring.track` - moving events about to peers
+
+upring-pub/sub
+
+Uses?
+
+* kv store
+* cache
+* pub/sub
+* RT app
+* discovery system
+* anything with distributed state
+
+Slides: https://mcollina.github.io/scaling-state/
+
+Uses https://www.npmjs.com/package/bespoke for slides.
+
+---
+
+# Final keynotes
+
+## Contributor panel
+
+Bryan English (bengl), Anna Henningsen, William Kapke, Jeremiah Spenkpiel, James Snell moderator
+
+`Buffer` constructor - a ruckus.  deprecation warning "didn't have messaging we wanted to have"
+
+Talking about code & learn - they are trying to bring way more people into node core as contributors and mentorship, seem to be pretty happy with it.
+
+"goal is to spread across as many people as possible, for redundancy..."
+
+"I consider myself bilingual, I speak fluent nonsense"
+
+`url.parse` totally fails the new URL working group test suite.  `url parse` and `new url` - don't know what to do with it.
+
+## Google cloud
+
+@justinbeckwith
+
+Google has 2.5 billion lines of JS
+
+google cloud vision API - extract text, generic label analysis (train a model), common logos
+
+CLOUD CATS app.
+
+https://npm.im/google-cloud
+
+google BigQuery - SQL shim over backend, free public datasets
+
+https://redit.com/r/listentothis
+
+google cloud stackdriver debugger
+
+## node @homeaway
+
+Patrick Ritchie, HomeAway @pritchie
+
+Began by consolidating vacation rental companies
+
+2008 - built java platform
+
+2013 - optimize to client-side building
+
+Observe orient decide act <=> build measure learn
+
+"node has the best open source ecosystem" - actually biggest...
+
+docker, mesos, fastly is a CDN tool
+
+## npm
+
+Ashley Williams npm is a company, @ag_dubs
+
+npm:
+* 23 employess
+* "wombat developers union" WDU (npm upside down)
+* unpublishing has been removed from the registry (except within 24 hrs of initial publish):
+  * instead, dissociate and deprecate process
+* Uses "follower" pattern, "changes feed"
+* greenkeeper.io - tool for keeping dependencies up to date
+* yarn - https://yarnpkg.com (It looks really good!)
+* https://replicate.npmjs.com - changes feed
+
+Slides: http://bit.ly/npm-numbers
+
+## State of the node
+
+Rod Vagg, at nodesource, on TSC
+
+https://groups.google.com/forum/#!forum/nodejs-sec - subscribe
+
+## Road Forward
+
+tracy hinds, education community manager, nodejs foundation
+
+Within last couple years, nodejs had only 4 core contributors.
+
+"tyranny of structurelessness" - lack of organization isn't actually structureless: implicit structure can be troubled.
+
+iojs forked, and had: faster, predictable releases, open governance, brought lots of people in.  Joyent was corporate steward of nodejs, then announced the foundation.  Then months later, iojs merged back (late summer 2015, v4)
+
+Maintaining the health of the project is a serious concern - they almost didn't actually survive, and (reading between the lines) thus the foundation.
+
+Diversity training for the board/leadership to set the bar - outside perspective.  Then, peer mediation: speculation that it would help alleviate tension where arises. Then, trusted, moderated communications channel - IRC can't be official because code of conduct, logging  not really in effect.
+
+Slack - not really open by default, but possible channel.
